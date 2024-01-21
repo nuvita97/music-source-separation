@@ -1,0 +1,8 @@
+numpy
+pandas
+os
+librosa
+torch
+spleeter
+musdb
+ffmpeg
