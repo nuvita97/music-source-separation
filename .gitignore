@@ -1,6 +1,12 @@
 ## Audio data
 data/**
 
+## Large models
+*.pt
+
+## Audio data
+data/**
+
 ## Saved models
 *.pt
 
