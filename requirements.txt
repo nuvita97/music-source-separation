@@ -6,3 +6,6 @@ torch
 spleeter
 musdb
 ffmpeg
+torch
+torchaudio
+mireval
