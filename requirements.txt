@@ -1,11 +1,7 @@
 numpy
 pandas
-os
+matplotlib
 librosa
 torch
-spleeter
-musdb
-ffmpeg
-torch
-torchaudio
-mireval
+torchsummary
+tqdm
