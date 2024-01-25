@@ -152,7 +152,7 @@ def inv_stft(audio_stft):
 
 
 # Process STFT
-def process_stft(audio_stft, stem_model):
+def convert_stft(audio_stft, stem_model, device):
     total_frame = audio_stft.shape[1] // 127 + 1
     done_frame = 0
     stem_model.eval()
