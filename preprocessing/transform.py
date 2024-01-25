@@ -1,7 +1,9 @@
 import os
 
 import numpy as np
+import torch
 import librosa
+from preprocessing.data import DSD100, dataloader, data_split
 
 
 rate = 8192
@@ -133,3 +135,48 @@ def save_stft(dataset_path, save_path):
         print(e)
 
     print(".npz file save complete")
+
+
+# Inverse STFT
+def inv_stft(audio_stft):
+    audio_inv_stft = librosa.istft(
+        (
+            audio_stft[
+                :511,
+            ]
+        ),
+        n_fft=1024,
+        hop_length=768,
+    )
+    return audio_inv_stft
+
+
+# Process STFT
+def process_stft(audio_stft, stem_model):
+    total_frame = audio_stft.shape[1] // 127 + 1
+    done_frame = 0
+    stem_model.eval()
+    for i in range(0, audio_stft.shape[1], 127):
+        mixture = np.abs(audio_stft[:511, i : i + 127])
+        col_num = mixture.shape[1]
+        if col_num != 127:
+            mixture = np.concatenate(
+                (mixture, np.zeros(shape=(511, 127 - col_num))), axis=1
+            )
+
+        mixture = torch.from_numpy(mixture[np.newaxis, np.newaxis, :, :]).to(device)
+        input = dataloader(mixture.to(torch.float32), batch_size=1)
+        with torch.no_grad():
+            for x in input:
+                # print(x.shape)
+                y = stem_model(x)
+                if i == 0:
+                    output = y[0][0]
+                else:
+                    if col_num == 127:
+                        output = torch.cat([output, y[0][0]], dim=1)
+                    else:
+                        output = torch.cat([output, y[0][0][:, :col_num]], dim=1)
+        done_frame += 1
+        # print(f"{done_frame}/{total_frame}")
+    return output
