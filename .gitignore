@@ -9,7 +9,8 @@ DSD100/**
 ## Model logs
 musdb_model/**
 cache/**
-
+unmix/**
+open-unmix/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
