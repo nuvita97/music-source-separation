@@ -6,3 +6,10 @@ torch
 torchsummary
 tqdm
 streamlit
+loguru
+streamlit-player
+blinker
+click
+protobuf
+python-dateutil
+streamlit_option_menu
