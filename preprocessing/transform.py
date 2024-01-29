@@ -27,7 +27,9 @@ def save_stft(dataset_path, save_path):
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
-        directories = sorted([dir for dir in os.listdir(dataset_path) if dir != '.DS_Store'])
+        directories = sorted(
+            [dir for dir in os.listdir(dataset_path) if dir != ".DS_Store"]
+        )
 
         mixture_folder_path = os.path.join(dataset_path, directories[0])
         sources_folder_path = os.path.join(dataset_path, directories[1])
@@ -35,13 +37,15 @@ def save_stft(dataset_path, save_path):
         # mixture_folder_path = dataset_path + "/" + sorted(os.listdir(dataset_path))[0]
         # sources_folder_path = dataset_path + "/" + sorted(os.listdir(dataset_path))[1]
         # for folder in sorted(os.listdir(mixture_folder_path)):
-        
-        for folder in sorted([f for f in os.listdir(mixture_folder_path) if f != '.DS_Store']):
+
+        for folder in sorted(
+            [f for f in os.listdir(mixture_folder_path) if f != ".DS_Store"]
+        ):
             mixture_song_folder_path = mixture_folder_path + "/" + folder
             sources_song_folder_path = sources_folder_path + "/" + folder
-            
+
             for song_name in sorted(os.listdir(mixture_song_folder_path)):
-            # for song_name in sorted([name for name in os.listdir(mixture_song_folder_path) if name != '.DS_Store']):
+                # for song_name in sorted([name for name in os.listdir(mixture_song_folder_path) if name != '.DS_Store']):
                 mixture_path = (
                     mixture_song_folder_path
                     + "/"
@@ -140,11 +144,7 @@ def save_stft(dataset_path, save_path):
 # Inverse STFT
 def inv_stft(audio_stft):
     audio_inv_stft = librosa.istft(
-        (
-            audio_stft[
-                :511,
-            ]
-        ),
+        (audio_stft[:511,]),
         n_fft=1024,
         hop_length=768,
     )
