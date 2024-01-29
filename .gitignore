@@ -1,14 +1,17 @@
 ## Audio data
 data/**
+DEPRECATED_data/**
+DSD100/**
 
 ## Large models
 *.pt
 
-## Audio data
-data/**
-
-## Saved models
-*.pt
+## Model logs
+musdb_model/**
+cache/**
+unmix/**
+open-unmix/**
+open_unmix/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
