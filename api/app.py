@@ -10,15 +10,21 @@ def main():
     # File upload
     audio_file = st.file_uploader("Upload Audio File", type=["wav", "mp3"])
 
+    # Model selection
+    model_options = ["Demucs", "Open Unmix", "U-Net"]
+    selected_model = st.selectbox("Select Model", model_options)
+
     if audio_file is not None:
         # Display uploaded audio file
         st.audio(audio_file, format="audio/wav")
 
         # Button to start separation
         if st.button("Separate Audio"):
-            # Send audio file to FastAPI for separation
+            # Send audio file and selected model to FastAPI for separation
             response = requests.post(
-                "http://localhost:8000/separate", files={"audio": audio_file}
+                "http://localhost:8000/separate",
+                files={"audio": audio_file},
+                data={"model": selected_model},
             )
 
             if response.status_code == 200:
