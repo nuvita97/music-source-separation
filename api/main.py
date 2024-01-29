@@ -1,30 +1,62 @@
-#
-
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import StreamingResponse
 import io
+import os
+import base64
+import numpy as np
+import torchaudio
+import librosa
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+from starlette.responses import FileResponse
+from openunmix import predict
 
 app = FastAPI()
 
 
 # Function to perform audio separation using your model (replace with your logic)
-def perform_audio_separation(audio_file: bytes) -> bytes:
-    # Replace the following line with your actual audio separation logic
-    # For example, you might use a library like librosa for processing
-    # and a pre-trained deep learning model for separation.
+def separate_ummix(audio_file):
+    waveform, sample_rate = librosa.load(audio_file)
 
-    # Placeholder: just return the same audio for now
-    return audio_file
+    estimates = predict.separate(
+        audio=waveform,
+        rate=sample_rate,
+        # targets=["vocals"],
+        # residual=True,
+        # model_str_or_path="unmix/unmix-vocal",
+    )
+
+    # Audio(estimates['vocals'].squeeze(0), rate=sample_rate)
+
+    # est_dict = {"vocal": waveform}
+    return estimates
 
 
 # FastAPI endpoint to handle audio separation
-@app.post("/separate-audio")
+@app.post("/separate")
 async def separate_audio(audio_file: UploadFile = File(...)):
+    waveform, sample_rate = torchaudio.load(audio_file.file)
+
     # Read the contents of the uploaded audio file
-    audio_content = await audio_file.read()
+    # audio_content = await audio_file.read()
 
     # Perform audio separation
-    separated_audio = perform_audio_separation(audio_content)
+    # separated_audio = separate_ummix(audio_content)
 
-    # Return the separated audio as a streaming response
-    return StreamingResponse(io.BytesIO(separated_audio), media_type="audio/wav")
+    # Return the dictionary of instrument audio
+    # return separated_audio
+
+    # Convert the numpy array to a list
+    np.save("waveform.npy", waveform)
+
+    return {"sr": sample_rate, "waveform": "api/waveform.npy"}
+    # return FileResponse("waveform.npy", media_type="application/octet-stream")
+
+    # # Convert the numpy array to bytes
+    # waveform_bytes = io.BytesIO()
+    # np.save(waveform_bytes, waveform)
+    # waveform_bytes = waveform_bytes.getvalue()
+
+    # # Convert bytes to base64 string
+    # waveform_str = base64.b64encode(waveform_bytes).decode("utf-8")
+
+    # # Return the waveform and sample rate as a response
+    # return JSONResponse(content={"sr": sample_rate, "waveform": waveform_str})
