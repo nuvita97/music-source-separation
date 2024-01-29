@@ -11,6 +11,7 @@ musdb_model/**
 cache/**
 unmix/**
 open-unmix/**
+open_unmix/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
