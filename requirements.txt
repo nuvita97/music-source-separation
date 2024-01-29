@@ -13,3 +13,4 @@ click
 protobuf
 python-dateutil
 streamlit_option_menu
+lyricsgenius
