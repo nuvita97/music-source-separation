@@ -13,13 +13,12 @@ app = FastAPI()
 
 
 # Function to perform audio separation using your model (replace with your logic)
-def separate_ummix(audio_file):
-    waveform, sample_rate = librosa.load(audio_file)
-
+def separate_ummix(waveform, sample_rate):
     estimates = predict.separate(
         audio=waveform,
         rate=sample_rate,
-        # targets=["vocals"],
+        targets=["vocals"],
+        residual=True
         # residual=True,
         # model_str_or_path="unmix/unmix-vocal",
     )
@@ -39,13 +38,10 @@ async def separate_audio(audio_file: UploadFile = File(...)):
     # audio_content = await audio_file.read()
 
     # Perform audio separation
-    # separated_audio = separate_ummix(audio_content)
+    separated_audio = separate_ummix(waveform, sample_rate)
 
-    # Return the dictionary of instrument audio
-    # return separated_audio
-
-    # Convert the numpy array to a list
-    np.save("waveform.npy", waveform)
+    waveform_vocal = separated_audio["vocals"]
+    np.save("waveform.npy", waveform_vocal)
 
     return {"sr": sample_rate, "waveform": "api/waveform.npy"}
     # return FileResponse("waveform.npy", media_type="application/octet-stream")

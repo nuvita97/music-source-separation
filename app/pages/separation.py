@@ -27,9 +27,10 @@ def page_instrument_separation():
         unsafe_allow_html=True,
     )
 
-    waveform = np.load("api/waveform.npy")
+    # TEST READING WAVEFORM
+    # waveform = np.load("api/waveform.npy")
     # log.info(waveform)
-    st.audio(waveform, sample_rate=44100)
+    # st.audio(waveform, sample_rate=44100)
 
     uploaded_file = st.file_uploader(
         "Choose a file",
@@ -87,7 +88,10 @@ def page_instrument_separation():
 
                     waveform_array = np.load(waveform_path)
                     # log.info(waveform)
-                    st.audio(waveform_array, sample_rate=sample_rate)
+
+                    # Display the result here
+                    st.markdown("<h2>Results</h2>", unsafe_allow_html=True)
+                    st.audio(waveform_array.squeeze(), sample_rate=sample_rate)
 
                     # Display the audio
                     # st.audio(waveform, sample_rate=sample_rate)
@@ -97,16 +101,9 @@ def page_instrument_separation():
                 else:
                     st.error("Failed to process the audio. Please try again.")
 
-                st.write(response)
-                st.write(response.text)
-
-                # Display the result here
-                st.markdown("<h2>Results</h2>", unsafe_allow_html=True)
-                # Add your result display code here
-
-                # Display the result here
-                st.markdown("<h2>Results</h2>", unsafe_allow_html=True)
-                # Add your result display code here
+                # TEST DISPLAYING API RESPONSE
+                # st.write(response)
+                # st.write(response.text)
 
             st.session_state.executed = True
 
@@ -123,7 +120,7 @@ def page_upload_from_url():
 
     selected_model = st.selectbox(
         "Select Separation Model:",
-        ["Custom Model", "OpenUnmix Model"],
+        ["Custom Model", "Open-Unmix Model"],
         key="model",
     )
     if url != "" and st.button("Execute 🎶", type="primary", key="url_button"):
