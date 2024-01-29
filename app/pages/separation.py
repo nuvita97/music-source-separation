@@ -13,7 +13,15 @@ from header import header
 out_path = Path("/tmp")
 in_path = Path("/tmp")
 
-API_URL = "http://127.0.0.1:8000/separate/"
+# API_URL = "http://127.0.0.1:8000/separate/"
+
+
+def call_api_by_model(model_choice):
+    if model_choice == "Custom U-Net Model":
+        api_url = "http://127.0.0.1:8000/separate"
+    elif model_choice == "Open-Unmix Model":
+        api_url = "http://127.0.0.1:8000/separate_sota"
+    return api_url
 
 
 def reset_execution():
@@ -47,7 +55,7 @@ def page_instrument_separation():
 
     selected_model = st.selectbox(
         "Select Separation Model:",
-        ["Custom Model", "OpenUnmix Model"],
+        ["Custom U-Net Model", "Open-Unmix Model"],
         key="model",
     )
 
@@ -78,20 +86,23 @@ def page_instrument_separation():
                 # Read the uploaded file
                 # file_bytes = uploaded_file.read()
 
+                api_url = call_api_by_model(selected_model)
+
                 # Send the file to the "separate-audio" API
-                response = requests.post(API_URL, files={"audio_file": uploaded_file})
+                response = requests.post(api_url, files={"audio_file": uploaded_file})
 
                 # Check if the request was successful
                 if response.status_code == 200:
                     sample_rate = response.json()["sr"]
                     waveform_path = response.json()["waveform"]
 
-                    waveform_array = np.load(waveform_path)
+                    waveform_array = np.load(waveform_path).squeeze()
                     # log.info(waveform)
 
                     # Display the result here
                     st.markdown("<h2>Results</h2>", unsafe_allow_html=True)
-                    st.audio(waveform_array.squeeze(), sample_rate=sample_rate)
+                    st.info(selected_model)
+                    st.audio(waveform_array, sample_rate=sample_rate)
 
                     # Display the audio
                     # st.audio(waveform, sample_rate=sample_rate)

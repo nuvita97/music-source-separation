@@ -1,18 +1,32 @@
-import io
-import os
-import base64
+import asyncio
+import tempfile
+from loguru import logger as log
+import sys
 import numpy as np
 import torchaudio
+import torch
 import librosa
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from starlette.responses import FileResponse
 from openunmix import predict
+from utils import separate_stem
+
+sys.path.append("../")
+from preprocessing.transform import convert_stft
 
 app = FastAPI()
 
 
-# Function to perform audio separation using your model (replace with your logic)
+def separate_unet(waveform, sample_rate):
+    stem = "vocal"
+    device = torch.device("cpu")
+    model = torch.load(f"../model/save/{stem}_best_model.pt", map_location=device)
+    audio_output = separate_stem(waveform, sample_rate, model)
+    estimates = {"vocals": audio_output}
+    return estimates
+
+
 def separate_ummix(waveform, sample_rate):
     estimates = predict.separate(
         audio=waveform,
@@ -30,29 +44,36 @@ def separate_ummix(waveform, sample_rate):
 
 
 # FastAPI endpoint to handle audio separation
-@app.post("/separate")
-async def separate_audio(audio_file: UploadFile = File(...)):
+@app.post("/separate_sota")
+async def separate_model_sota(audio_file: UploadFile = File(...)):
     waveform, sample_rate = torchaudio.load(audio_file.file)
+    # waveform = waveform.numpy()
 
-    # Read the contents of the uploaded audio file
-    # audio_content = await audio_file.read()
-
-    # Perform audio separation
     separated_audio = separate_ummix(waveform, sample_rate)
+    # separated_audio = separate_unet(audio_file.file)
 
     waveform_vocal = separated_audio["vocals"]
     np.save("waveform.npy", waveform_vocal)
 
     return {"sr": sample_rate, "waveform": "api/waveform.npy"}
-    # return FileResponse("waveform.npy", media_type="application/octet-stream")
 
-    # # Convert the numpy array to bytes
-    # waveform_bytes = io.BytesIO()
-    # np.save(waveform_bytes, waveform)
-    # waveform_bytes = waveform_bytes.getvalue()
 
-    # # Convert bytes to base64 string
-    # waveform_str = base64.b64encode(waveform_bytes).decode("utf-8")
+@app.post("/separate")
+async def separate_model_train(audio_file: UploadFile = File(...)):
+    # Create a temporary file
+    # with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio:
+    #     # Save the uploaded file to the temporary file
+    #     contents = await audio_file.read()
+    #     temp_audio.write(contents)
+    #     temp_audio.flush()
 
-    # # Return the waveform and sample rate as a response
-    # return JSONResponse(content={"sr": sample_rate, "waveform": waveform_str})
+    waveform, sample_rate = librosa.load(audio_file.file, sr=11025)
+    # # waveform = waveform.numpy()
+
+    # # separated_audio = separate_ummix(waveform, sample_rate)
+    separated_audio = separate_unet(waveform, sample_rate)
+
+    waveform_vocal = separated_audio["vocals"]
+    np.save("waveform.npy", waveform_vocal)
+
+    return {"sr": sample_rate, "waveform": "api/waveform.npy"}
