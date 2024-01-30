@@ -16,3 +16,9 @@ streamlit_option_menu
 lyricsgenius
 openai-whisper
 openunmix
+uvicorn
+fastapi
+matplotlib
+pytube
+moviepy
+
