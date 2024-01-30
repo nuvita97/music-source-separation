@@ -7,8 +7,6 @@ import torchaudio
 import torch
 import librosa
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
-from starlette.responses import FileResponse
 from openunmix import predict
 from utils import separate_stem
 
