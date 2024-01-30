@@ -3,8 +3,9 @@ data/**
 DEPRECATED_data/**
 DSD100/**
 
-## Large models
+## Large saved models and files
 *.pt
+*.npy
 
 ## Model logs
 musdb_model/**
@@ -12,6 +13,9 @@ cache/**
 unmix/**
 open-unmix/**
 open_unmix/**
+
+## Test files
+test.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
