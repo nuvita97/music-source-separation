@@ -3,7 +3,7 @@ data/**
 DEPRECATED_data/**
 DSD100/**
 
-## Large models
+## Large saved models and files
 *.pt
 *.npy
 
