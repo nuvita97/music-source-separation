@@ -50,8 +50,8 @@ def page_instrument_separation():
 
     # Create a dictionary to store the checkbox states
     checkboxes = {
-        "vocal": st.checkbox("Vocals 🎤", key="vocals"),
-        "drum": st.checkbox("Drums 🥁", key="drums"),
+        "vocals": st.checkbox("Vocals 🎤", key="vocals"),
+        "drums": st.checkbox("Drums 🥁", key="drums"),
         "bass": st.checkbox("Bass 🎸", key="bass"),
         "other": st.checkbox("Other 🎶", key="other"),
     }

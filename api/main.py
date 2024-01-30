@@ -11,17 +11,17 @@ from openunmix import predict
 from utils import separate_stem
 
 sys.path.append("../")
-from preprocessing.transform import convert_stft
 
 app = FastAPI()
 
 
 def separate_unet(waveform, sample_rate):
-    stem = "vocal"
     device = torch.device("cpu")
-    model = torch.load(f"../model/save/{stem}_best_model.pt", map_location=device)
-    audio_output = separate_stem(waveform, sample_rate, model)
-    estimates = {"vocals": audio_output}
+    estimates = {}
+    for stem in ["vocals", "drums", "bass", "other"]:
+        model = torch.load(f"../model/save/{stem}_best_model.pt", map_location=device)
+        audio_output = separate_stem(waveform, sample_rate, model)
+        estimates[stem] = audio_output
     return estimates
 
 
@@ -43,25 +43,15 @@ async def separate_model_sota(audio_file: UploadFile = File(...)):
     # waveform = waveform.numpy()
 
     separated_audio = separate_ummix(waveform, sample_rate)
-    # separated_audio = separate_unet(audio_file.file)
 
-    waveform_vocal = separated_audio["vocals"]
-    waveform_drum = separated_audio["drums"]
-    waveform_bass = separated_audio["bass"]
-    waveform_other = separated_audio["other"]
+    result = {"sr": sample_rate}
 
-    np.save("vocal.npy", waveform_vocal)
-    np.save("drum.npy", waveform_drum)
-    np.save("bass.npy", waveform_bass)
-    np.save("other.npy", waveform_other)
+    for stem in ["vocals", "drums", "bass", "other"]:
+        waveform = separated_audio[stem]
+        np.save(f"{stem}.npy", waveform)
+        result[stem] = f"api/{stem}.npy"
 
-    return {
-        "sr": sample_rate,
-        "vocal": "api/vocal.npy",
-        "drum": "api/drum.npy",
-        "bass": "api/bass.npy",
-        "other": "api/other.npy",
-    }
+    return result
 
 
 @app.post("/separate")
@@ -76,10 +66,13 @@ async def separate_model_train(audio_file: UploadFile = File(...)):
     waveform, sample_rate = librosa.load(audio_file.file, sr=11025)
     # # waveform = waveform.numpy()
 
-    # # separated_audio = separate_ummix(waveform, sample_rate)
     separated_audio = separate_unet(waveform, sample_rate)
 
-    waveform_vocal = separated_audio["vocals"]
-    np.save("waveform.npy", waveform_vocal)
+    result = {"sr": sample_rate}
 
-    return {"sr": sample_rate, "waveform": "api/waveform.npy"}
+    for stem in ["vocals", "drums", "bass", "other"]:
+        waveform = separated_audio[stem]
+        np.save(f"{stem}.npy", waveform)
+        result[stem] = f"api/{stem}.npy"
+
+    return result
