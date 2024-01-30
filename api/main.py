@@ -36,6 +36,13 @@ def separate_ummix(waveform, sample_rate):
     return estimates
 
 
+def extract_vocal(waveform, sample_rate):
+    estimates = predict.separate(
+        audio=waveform, rate=sample_rate, targets=["vocals"], residual=True
+    )
+    return estimates
+
+
 # FastAPI endpoint to handle audio separation
 @app.post("/separate_sota")
 async def separate_model_sota(audio_file: UploadFile = File(...)):
@@ -75,4 +82,15 @@ async def separate_model_train(audio_file: UploadFile = File(...)):
         np.save(f"{stem}.npy", waveform)
         result[stem] = f"api/{stem}.npy"
 
+    return result
+
+
+@app.post("/separate_karaoke")
+async def separate_model_karaoke(audio_file: UploadFile = File(...)):
+    waveform, sample_rate = torchaudio.load(audio_file.file)
+    separated_audio = extract_vocal(waveform, sample_rate)
+    instrument = separated_audio["residual"]
+    np.save(f"residual.npy", instrument)
+    instrument_array = f"api/residual.npy"
+    result = {"sr": sample_rate, "residual": instrument_array}
     return result
