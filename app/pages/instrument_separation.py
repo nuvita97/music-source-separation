@@ -98,32 +98,11 @@ def page_instrument_separation():
 
                 # Check if the request was successful
                 if response.status_code == 200:
-                    # sample_rate = response.json()["sr"]
-                    # vocal_path = response.json()["vocal"]
-                    # drum_path = response.json()["drum"]
-                    # bass_path = response.json()["bass"]
-                    # other_path = response.json()["other"]
-
-                    # vocal_array = np.load(vocal_path).squeeze()
-                    # drum_array = np.load(drum_path).squeeze()
-                    # bass_array = np.load(bass_path).squeeze()
-                    # other_array = np.load(other_path).squeeze()
-                    # log.info(waveform)
-
                     # Display the result
                     st.markdown("<h2>Results</h2>", unsafe_allow_html=True)
                     st.info(f"Separated by {selected_model} Model")
 
                     display_selected_instruments(selected_instruments, response)
-
-                    # st.text("Vocal")
-                    # st.audio(vocal_array, sample_rate=sample_rate)
-                    # st.text("Drum")
-                    # st.audio(drum_array, sample_rate=sample_rate)
-                    # st.text("Bass")
-                    # st.audio(bass_array, sample_rate=sample_rate)
-                    # st.text("Other instrument")
-                    # st.audio(other_array, sample_rate=sample_rate)
 
                     st.success("Processing complete!")
                 else:

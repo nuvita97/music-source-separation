@@ -33,10 +33,6 @@ def separate_ummix(waveform, sample_rate):
         # residual=True
         # model_str_or_path="unmix/unmix-vocal",
     )
-
-    # Audio(estimates['vocals'].squeeze(0), rate=sample_rate)
-
-    # est_dict = {"vocal": waveform}
     return estimates
 
 
