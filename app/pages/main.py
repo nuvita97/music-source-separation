@@ -4,6 +4,7 @@ from instrument_separation import page_instrument_separation
 from upload_from_url import page_upload_from_url
 from karaoke import page_karaoke
 from about import page_about
+
 def main():
     st.set_page_config(
         page_title="Music Source Separation",

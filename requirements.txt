@@ -14,5 +14,7 @@ protobuf
 python-dateutil
 streamlit_option_menu
 lyricsgenius
+openai-whisper
 openunmix
 uvicorn
+openai-whisper
