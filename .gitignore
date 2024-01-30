@@ -5,6 +5,7 @@ DSD100/**
 
 ## Large models
 *.pt
+*.npy
 
 ## Model logs
 musdb_model/**
