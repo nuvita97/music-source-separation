@@ -29,9 +29,8 @@ def separate_ummix(waveform, sample_rate):
     estimates = predict.separate(
         audio=waveform,
         rate=sample_rate,
-        targets=["vocals"],
-        residual=True
-        # residual=True,
+        # targets=["vocals"],
+        # residual=True
         # model_str_or_path="unmix/unmix-vocal",
     )
 
@@ -51,9 +50,22 @@ async def separate_model_sota(audio_file: UploadFile = File(...)):
     # separated_audio = separate_unet(audio_file.file)
 
     waveform_vocal = separated_audio["vocals"]
-    np.save("waveform.npy", waveform_vocal)
+    waveform_drum = separated_audio["drums"]
+    waveform_bass = separated_audio["bass"]
+    waveform_other = separated_audio["other"]
 
-    return {"sr": sample_rate, "waveform": "api/waveform.npy"}
+    np.save("vocal.npy", waveform_vocal)
+    np.save("drum.npy", waveform_drum)
+    np.save("bass.npy", waveform_bass)
+    np.save("other.npy", waveform_other)
+
+    return {
+        "sr": sample_rate,
+        "vocal": "api/vocal.npy",
+        "drum": "api/drum.npy",
+        "bass": "api/bass.npy",
+        "other": "api/other.npy",
+    }
 
 
 @app.post("/separate")

@@ -16,6 +16,15 @@ def call_api_by_model(model_choice):
     return api_url
 
 
+def display_selected_instruments(selected_instruments, response):
+    sample_rate = response.json()["sr"]
+    for stem in selected_instruments:
+        stem_path = response.json()[stem]
+        stem_array = np.load(stem_path).squeeze()
+        st.text(stem)
+        st.audio(stem_array, sample_rate=sample_rate)
+
+
 def reset_execution():
     st.session_state.executed = False
 
@@ -33,11 +42,24 @@ def page_instrument_separation():
         help="Supported formats: mp3, wav, ogg, flac.",
     )
 
-    selected_instrument = st.selectbox(
-        "Select Instrument to Separate:",
-        ["Vocals, Drums, Bass & Other", "Vocals 🎤", "Drums 🥁", "Bass 🎸", "Other 🎶"],
-        key="instrument",
-    )
+    # selected_instrument = st.selectbox(
+    #     "Select Instrument to Separate:",
+    #     ["Vocals, Drums, Bass & Other", "Vocals 🎤", "Drums 🥁", "Bass 🎸", "Other 🎶"],
+    #     key="instrument",
+    # )
+
+    # Create a dictionary to store the checkbox states
+    checkboxes = {
+        "vocal": st.checkbox("Vocals 🎤", key="vocals"),
+        "drum": st.checkbox("Drums 🥁", key="drums"),
+        "bass": st.checkbox("Bass 🎸", key="bass"),
+        "other": st.checkbox("Other 🎶", key="other"),
+    }
+
+    # Get the selected instruments
+    selected_instruments = [
+        instrument for instrument, checked in checkboxes.items() if checked
+    ]
 
     selected_model = st.selectbox(
         "Select Separation Model:",
@@ -76,16 +98,32 @@ def page_instrument_separation():
 
                 # Check if the request was successful
                 if response.status_code == 200:
-                    sample_rate = response.json()["sr"]
-                    waveform_path = response.json()["waveform"]
+                    # sample_rate = response.json()["sr"]
+                    # vocal_path = response.json()["vocal"]
+                    # drum_path = response.json()["drum"]
+                    # bass_path = response.json()["bass"]
+                    # other_path = response.json()["other"]
 
-                    waveform_array = np.load(waveform_path).squeeze()
+                    # vocal_array = np.load(vocal_path).squeeze()
+                    # drum_array = np.load(drum_path).squeeze()
+                    # bass_array = np.load(bass_path).squeeze()
+                    # other_array = np.load(other_path).squeeze()
                     # log.info(waveform)
 
                     # Display the result
                     st.markdown("<h2>Results</h2>", unsafe_allow_html=True)
                     st.info(f"Separated by {selected_model} Model")
-                    st.audio(waveform_array, sample_rate=sample_rate)
+
+                    display_selected_instruments(selected_instruments, response)
+
+                    # st.text("Vocal")
+                    # st.audio(vocal_array, sample_rate=sample_rate)
+                    # st.text("Drum")
+                    # st.audio(drum_array, sample_rate=sample_rate)
+                    # st.text("Bass")
+                    # st.audio(bass_array, sample_rate=sample_rate)
+                    # st.text("Other instrument")
+                    # st.audio(other_array, sample_rate=sample_rate)
 
                     st.success("Processing complete!")
                 else:
