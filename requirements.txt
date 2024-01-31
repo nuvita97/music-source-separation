@@ -1,7 +1,7 @@
 numpy
 pandas
 matplotlib
-librosa
+librosator
 torch
 torchsummary
 tqdm
@@ -13,6 +13,7 @@ click
 protobuf
 python-dateutil
 streamlit_option_menu
+yt-dlp
 lyricsgenius
 openai-whisper
 openunmix
