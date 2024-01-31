@@ -1,9 +1,9 @@
 import streamlit as st
-from instrument_separation import page_instrument_separation
-from upload_from_url import page_upload_from_url
+
 from karaoke import page_karaoke
 from about import page_about
 from separation_features import page_upload_and_separation
+from header import header
 
 def main():
     st.set_page_config(
@@ -22,6 +22,7 @@ def main():
     st.sidebar.title("Navigation")
     selected_page = st.sidebar.radio("Go to", list(pages.keys()))
 
+    header()
 
     pages[selected_page]()
 
