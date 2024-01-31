@@ -19,5 +19,7 @@ openai-whisper
 openunmix
 uvicorn
 fastapi
+matplotlib
 pytube
 moviepy
+

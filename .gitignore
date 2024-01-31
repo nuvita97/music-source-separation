@@ -3,7 +3,9 @@ data/**
 DEPRECATED_data/**
 DSD100/**
 
-## Large saved models and files
+audio/input/**
+youtube_extractions/**
+## Large models
 *.pt
 *.npy
 
