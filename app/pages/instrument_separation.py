@@ -1,8 +1,11 @@
 import numpy as np
 import requests
 import streamlit as st
+import matplotlib.pyplot as plt
+import librosa.display
 from loguru import logger as log
 from pathlib import Path
+
 
 out_path = Path("/tmp")
 in_path = Path("/tmp")
@@ -27,6 +30,34 @@ def display_selected_instruments(selected_instruments, response):
 
 def reset_execution():
     st.session_state.executed = False
+
+def plot_wave(y, sr):
+    fig, ax = plt.subplots()
+    img = librosa.display.waveshow(y, sr=sr, x_axis="time", ax=ax)
+    return plt.gcf()
+
+def show_results(model_name: str, dir_name_output: str, file_sources: list):
+    sources = get_sources(out_path / Path(model_name) / dir_name_output, file_sources)
+    tab_sources = st.tabs([f"**{label_sources.get(k)}**" for k in sources.keys()])
+    for i, (file, pathname) in enumerate(sources.items()):
+        with tab_sources[i]:
+            cols = st.columns(2)
+            with cols[0]:
+                auseg = load_audio_segment(pathname, "mp3")
+                st.image(
+                    plot_audio(
+                        auseg,
+                        32767,
+                        file=file,
+                        model_name=model_name,
+                        dir_name_output=dir_name_output,
+                    ),
+                    use_column_width="always",
+                )
+            with cols[1]:
+                st.audio(str(pathname))
+    log.info(f"Displaying results for {dir_name_output} - {model_name}")
+
 
 
 def page_instrument_separation():
@@ -98,11 +129,21 @@ def page_instrument_separation():
 
                 # Check if the request was successful
                 if response.status_code == 200:
-                    # Display the result
                     st.markdown("<h2>Results</h2>", unsafe_allow_html=True)
                     st.info(f"Separated by {selected_model} Model")
 
                     display_selected_instruments(selected_instruments, response)
+
+                    show_results(selected_model, response.json()["dir_name_output"], selected_instruments)
+
+                    show_waveform = st.checkbox("Show Waveform")
+                    if show_waveform:
+                        for stem in selected_instruments:
+                            stem_path = response.json()[stem]
+                            stem_array = np.load(stem_path).squeeze()
+                            st.text(stem)
+                            st.audio(stem_array, sample_rate=response.json()["sr"])
+                            plot_wave(stem_array, response.json()["sr"])
 
                     st.success("Processing complete!")
                 else:

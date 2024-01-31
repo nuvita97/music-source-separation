@@ -1,11 +1,11 @@
 import numpy as np
 import requests
 import streamlit as st
-from loguru import logger as log
 from pathlib import Path
-import lyricsgenius as genius
+from pytube import YouTube
+from moviepy.editor import VideoFileClip
 import whisper
-import os
+import lyricsgenius as genius
 
 # Set up Genius API
 api = genius.Genius("v_CyxiEGCu4AlDye7BXWPP4X8a5wij5AjfR2thvUnoMPQJAbmga7SLY8ReD8c5D4")
@@ -19,6 +19,9 @@ in_path = Path("audio/input/")
 # Define the input directory
 in_path.mkdir(parents=True, exist_ok=True)
 
+# Function to download YouTube video, extract audio, and transcribe
+def download_extract_transcribe_youtube(video_url):
+    st.info("Downloading video...")
 
 def page_karaoke():
     st.markdown("<h1>Karaoke</h1>", unsafe_allow_html=True)
@@ -30,21 +33,28 @@ def page_karaoke():
     song_title = st.text_input("Enter the song title")
     artist_name = st.text_input("Enter the artist name")
 
-    # Button to fetch lyrics
-    if st.button("Get Lyrics"):
-        # Search for the song on Genius
-        song = api.search_song(song_title, artist_name)
+    # Download the video
+    youtube = YouTube(video_url)
+    video = youtube.streams.first()
+    downloaded_file = video.download()
 
-        # Check if a song was found
-        if song is not None:
-            # Display the lyrics
-            st.write(song.lyrics)
-        else:
-            st.write("Song not found. Please check the song title and artist name.")
+    st.info("Extracting audio...")
 
-    # Add audio file upload and transcription functionality
-    st.title("Audio Transcription")
+    # Extract audio
+    video_clip = VideoFileClip(downloaded_file)
+    audio_clip = video_clip.audio
+    audio_file_path = in_path / "youtube_audio.mp3"
+    audio_clip.write_audiofile(str(audio_file_path))
 
+    st.info("Transcribing audio...")
+
+    # Perform transcription using Whisper
+    model = whisper.load_model("base")
+    result = model.transcribe(str(audio_file_path), fp16=False, verbose=True)
+
+    # Display the transcribed text
+    st.write(f"Transcription Result: {result['text']}")
+    
     uploaded_audio = st.file_uploader(
         "Upload an audio file", type=["mp3", "wav", "ogg", "flac"]
     )
@@ -111,6 +121,45 @@ def display_vocal_extract(response):
 def callback():
     st.session_state.transcribe_button = True
 
+
+def page_karaoke():
+    st.markdown("<h1>Karaoke</h1>", unsafe_allow_html=True)
+
+    # Navigation
+    selected_section = st.selectbox("Select Section", ["Lyric Finder", "Audio Transcription", "YouTube Video Transcription"])
+
+    # Section 1: Lyric Finder
+    if selected_section == "Lyric Finder":
+        st.title("Lyric Finder")
+        song_title = st.text_input("Enter the song title")
+        artist_name = st.text_input("Enter the artist name")
+        if st.button("Get Lyrics"):
+            song = api.search_song(song_title, artist_name)
+            if song is not None:
+                st.write(song.lyrics)
+            else:
+                st.write("Song not found. Please check the song title and artist name.")
+
+    # Section 2: Audio Transcription
+    elif selected_section == "Audio Transcription":
+        st.title("Audio Transcription")
+        uploaded_audio = st.file_uploader("Upload an audio file", type=["mp3", "wav", "ogg", "flac"])
+        if uploaded_audio:
+            st.audio(uploaded_audio, format='audio/wav')
+            transcribe_button = st.button("Transcribe Audio", type="primary")
+            if transcribe_button:
+                uploaded_audio_path = save_uploaded_audio(uploaded_audio)
+                transcribe_audio(uploaded_audio_path)
+
+    # Section 3: YouTube Video Transcription
+    elif selected_section == "YouTube Video Transcription":
+        st.title("YouTube Video Transcription")
+        youtube_url = st.text_input("Enter YouTube Video URL:")
+        if st.button("Download, Extract, and Transcribe"):
+            if youtube_url:
+                download_extract_transcribe_youtube(youtube_url)
+            else:
+                st.warning("Please enter a valid YouTube video URL.")
 
 # Call this function at the end of your script to run the app
 page_karaoke()
