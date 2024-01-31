@@ -19,11 +19,4 @@ def header(logo_and_title=True):
             )
 
 # Usage in your main script
-if __name__ == "__main__":
-    st.set_page_config(
-        page_title="Action Learning : Music source separation",
-        page_icon="images/logo.jpg",
-        layout="wide",
-        initial_sidebar_state="collapsed",
-    )
-    header()
+
