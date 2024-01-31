@@ -2,8 +2,10 @@ import streamlit as st
 from header import header
 from instrument_separation import page_instrument_separation
 from upload_from_url import page_upload_from_url
+from get_url_content import page_get_url_content
 from karaoke import page_karaoke
 from about import page_about
+
 
 def main():
     st.set_page_config(
@@ -15,7 +17,8 @@ def main():
 
     pages = {
         "Instrument Separation": page_instrument_separation,
-        "Upload from URL": page_upload_from_url,
+        # "Upload from URL": page_upload_from_url,
+        "Upload from URL": page_get_url_content,
         "Karaoke": page_karaoke,
         "About": page_about,
     }
@@ -26,6 +29,7 @@ def main():
     header()  # Call the header function
 
     pages[selected_page]()
+
 
 if __name__ == "__main__":
     main()
