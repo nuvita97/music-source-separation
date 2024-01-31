@@ -91,9 +91,10 @@ def page_karaoke():
         youtube_url = st.text_input("Enter YouTube Video URL:")
         if st.button("Download, Extract, and Transcribe"):
             if youtube_url:
+                play_youtube_video(youtube_url)
                 download_extract_transcribe_youtube(youtube_url)
             else:
                 st.warning("Please enter a valid YouTube video URL.")
 
-# Call this function at the end of your script to run the app
-page_karaoke()
+def play_youtube_video(video_url):
+    st.video(video_url)
