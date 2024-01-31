@@ -114,5 +114,5 @@ async def separate_sota_by_path(audio_request: AudioRequest):
         waveform = separated_audio[stem]
         file_path = save_path / f"{stem}.npy"
         np.save(file_path, waveform)
-        result[stem] = f"api/{stem}.npy"
+        result[stem] = f"api/{file_path}"
     return result
