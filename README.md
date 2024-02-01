@@ -9,33 +9,6 @@ MMaVVie also has a karaoke feature that allows you to sing along with your favou
 MMaVVie is a fun and innovative app that gives you more control and creativity over your music. It is composed of two parts: the frontend, which is built with Streamlit, and the backend, which is powered by FastAPI. 
 
 
-### Requirements
-```
-numpy==1.26.3
-pandas==2.2.0
-matplotlib==3.8.2
-librosa==0.10.1
-torch==2.1.2
-torchsummary==1.5.1
-tqdm==4.66.1
-streamlit==1.30.0
-loguru==0.7.2
-streamlit-player==0.1.5
-blinker==1.7.0
-click==8.1.7
-protobuf==4.25.2
-python-dateutil==2.8.2
-streamlit_option_menu==0.3.12
-yt-dlp==2023.12.30
-lyricsgenius==3.0.1
-openai-whisper==20231117
-openunmix==1.2.1
-uvicorn==0.27.0.post1
-fastapi==0.109.0
-pytube==15.0.0
-moviepy==1.0.3
-```
-
 ### Setup
 To run the app, you need to have Python >= 3.6 installed on your system. You also need to install the dependencies listed in the requirements.txt file.
 
@@ -59,7 +32,11 @@ This will install all the packages listed in the requirements.txt file in your v
 Step 2: Launch the API
 The API is built with FastAPI, a modern and fast web framework for building APIs. To launch the API, you can run the following command in your terminal:
 
-`uvicorn main:app --reload`
+```
+cd app
+
+uvicorn main:app --reload
+```
 
 This will start a local server on port 8000, and reload the code automatically whenever you make any changes. You can access the API documentation at http://localhost:8000/docs.
 
@@ -71,18 +48,21 @@ The UI is built with Streamlit, an open-source app framework for data science an
 This will open a new browser window on port 8501, where you can interact with the app. You can also access the UI at http://localhost:8501.
 
 
+### App Features
+MMaVVie App has two main features that let you enjoy music in different ways:
 
+`Upload and Separate Audio`: This feature allows you to add a song to the app and separate it into its sources. You can add a song in one of three ways:
 
+-Paste a video URL from YouTube
 
+-Search for a song on YouTube
 
+-Drag and drop an audio file from your local machine
 
+`Karaoke Feature`: This feature allows you to sing along with a song and see its lyrics on the screen. You can add a song in one of two ways:
 
+-Paste a video URL from YouTube
 
+-Drag and drop an audio file from your local machine
 
-
-
-
-##Intro
-Applic
-requirements
-how to set up
+Once the song is validated, the app will return the instrumental parts of the song and display the lyrics in real-time. You can also search for the lyrics directly if you prefer.
