@@ -172,114 +172,51 @@ def download_uploaded_file(uploaded_file, output_folder):
 
 
 def page_upload_and_separation():
-    st.markdown("<h1>Upload and Separation</h1>", unsafe_allow_html=True)
-
-    option_menu = st.selectbox(
-        "Select Source:",
-        ["Paste URL", "Search on YouTube", "Upload Audio File"],
-        key="source_option",
+    st.markdown("<h2></h2>", unsafe_allow_html=True)
+    st.markdown(
+        "<div style='text-align: center;'><h1>Audio Separation</h1></div>",
+        unsafe_allow_html=True,
     )
+    st.markdown("<h2></h2>", unsafe_allow_html=True)
+    st.markdown("<h2></h2>", unsafe_allow_html=True)
 
-    if option_menu == "Paste URL" or option_menu == "Search on YouTube":
-        # PASTE URL
-        if option_menu == "Paste URL":
-            st.markdown("<h2>Upload from URL</h2>", unsafe_allow_html=True)
-            source_url = st.text_input("Enter the URL:", key="source_url")
-            # Options
-            st.markdown("<h2>Select Instruments and Model</h2>", unsafe_allow_html=True)
-            checkboxes = {
-                "vocals": st.checkbox("Vocals 🎤", key="vocals"),
-                "drums": st.checkbox("Drums 🥁", key="drums"),
-                "bass": st.checkbox("Bass 🎸", key="bass"),
-                "other": st.checkbox("Other 🎶", key="other"),
-            }
-            selected_instruments = [
-                instrument for instrument, checked in checkboxes.items() if checked
-            ]
-            selected_model = st.selectbox(
-                "Select Separation Model:",
-                ["Open-Unmix", "Custom U-Net"],
-                key="model",
-            )
-            # Separation
-            if st.button(
-                "Separate Music Sources 🎶", type="primary", use_container_width=True
-            ):
-                if source_url:
-                    audio_file_path = download_audio(
-                        source_url, "audio/youtube"  # change the output directory
-                    )
-                    st.write("Orginal Audio")
-                    st.audio(audio_file_path, format="audio/wav")
-                else:
-                    st.error("Please enter a valid URL")
-                # API Call
-                api_call_and_display(
-                    audio_file_path, selected_model, selected_instruments
-                )
+    # Set up styling for the tabs
+    # Apply CSS styling to adjust font size in tabs
+    font_css = """
+            <style>
+                button[data-baseweb="tab"] > div[data-testid="stMarkdownContainer"] > p {
+                    font-size: 25px;
+                }
+            </style>
+            """
+    st.write(font_css, unsafe_allow_html=True)
 
-        # YOUTUBE SEARCH
-        elif option_menu == "Search on YouTube":
-            st.markdown("<h2>Search on Youtube</h2>", unsafe_allow_html=True)
-            search_query = st.text_input(
-                "Search on YouTube:",
-                value="What do you want to separate",
-                key="youtube_search_input",
-            )
-            video_options = search_youtube(search_query)
-            selected_video = st.selectbox(
-                "Select a video", video_options, key="youtube_video_selection"
-            )
-            source_url = get_youtube_url(selected_video)
-            # Options
-            st.markdown("<h2>Select Instruments and Model</h2>", unsafe_allow_html=True)
-            checkboxes = {
-                "vocals": st.checkbox("Vocals 🎤", key="vocals"),
-                "drums": st.checkbox("Drums 🥁", key="drums"),
-                "bass": st.checkbox("Bass 🎸", key="bass"),
-                "other": st.checkbox("Other 🎶", key="other"),
-            }
-            selected_instruments = [
-                instrument for instrument, checked in checkboxes.items() if checked
-            ]
-            selected_model = st.selectbox(
-                "Select Separation Model:",
-                ["Open-Unmix", "Custom U-Net"],
-                key="model",
-            )
-            # Separation
-            if st.button(
-                "Separate Music Sources 🎶", type="primary", use_container_width=True
-            ):
-                if source_url:
-                    audio_file_path = download_audio(
-                        source_url, "audio/youtube"  # change the output directory
-                    )
-                    st.write("Orginal Audio")
-                    st.audio(audio_file_path, format="audio/wav")
-                else:
-                    st.error("Please select a valid song")
-                # API Call
-                api_call_and_display(
-                    audio_file_path, selected_model, selected_instruments
-                )
+    # Create the tabs with visible characters for whitespace
+    list_tabs = ["Paste URL", "Search on YouTube", "Upload Audio File"]
+    tabs_with_whitespace = [s.center(70, "\u00A0") for s in list_tabs]
 
-    # UPLOAD FILE
-    elif option_menu == "Upload Audio File":
-        st.markdown("<h2>Upload Audio File</h2>", unsafe_allow_html=True)
-        uploaded_file = st.file_uploader(
-            "Choose a file",
-            type=["mp3", "wav", "ogg", "flac"],
-            key="file",
-            help="Supported formats: mp3, wav, ogg, flac.",
-        )
+    # Create the tabs
+    selected_section = st.tabs(tabs_with_whitespace)
+
+    # Section 1: Paste URL
+    with selected_section[0]:
+        st.markdown("<h2>Upload from URL</h2>", unsafe_allow_html=True)
+        source_url = st.text_input("Enter the URL:", key="paste_source_url")
+        if source_url:
+            audio_file_path = download_audio(
+                source_url, "audio/youtube"  # change the output directory
+            )
+            st.write("Orginal Audio")
+            st.audio(audio_file_path, format="audio/wav")
+        # else:
+        #     st.error("Please enter a valid URL")
         # Options
         st.markdown("<h2>Select Instruments and Model</h2>", unsafe_allow_html=True)
         checkboxes = {
-            "vocals": st.checkbox("Vocals 🎤", key="vocals"),
-            "drums": st.checkbox("Drums 🥁", key="drums"),
-            "bass": st.checkbox("Bass 🎸", key="bass"),
-            "other": st.checkbox("Other 🎶", key="other"),
+            "vocals": st.checkbox("Vocals 🎤", key="paste_vocals"),
+            "drums": st.checkbox("Drums 🥁", key="paste_drums"),
+            "bass": st.checkbox("Bass 🎸", key="paste_bass"),
+            "other": st.checkbox("Other 🎶", key="paste_other"),
         }
         selected_instruments = [
             instrument for instrument, checked in checkboxes.items() if checked
@@ -287,23 +224,120 @@ def page_upload_and_separation():
         selected_model = st.selectbox(
             "Select Separation Model:",
             ["Open-Unmix", "Custom U-Net"],
-            key="model",
+            key="paste_model",
+        )
+        # Separation
+        if st.button(
+            "Separate Music Sources 🎶",
+            type="primary",
+            key="paste_separate_button",
+            use_container_width=True,
+        ):
+            # Show processing message
+            processing_message = st.empty()
+            processing_message.info("Processing...")
+            # API Call
+            api_call_and_display(audio_file_path, selected_model, selected_instruments)
+            processing_message.empty()
+
+    # Section 2: Search on YouTube
+    with selected_section[1]:
+        st.markdown("<h2>Search on Youtube</h2>", unsafe_allow_html=True)
+        search_query = st.text_input(
+            "Search on YouTube:",
+            value="Choose a song to separate ",
+            key="youtube_search_input",
+        )
+        video_options = search_youtube(search_query)
+        selected_video = st.selectbox(
+            "Select a video", video_options, key="youtube_video_selection"
+        )
+        source_url = get_youtube_url(selected_video)
+        if source_url:
+            audio_file_path = download_audio(
+                source_url, "audio/youtube"  # change the output directory
+            )
+            st.write("Orginal Audio")
+            st.audio(audio_file_path, format="audio/wav")
+        else:
+            st.error("Please select a valid song")
+        # Options
+        st.markdown("<h2>Select Instruments and Model</h2>", unsafe_allow_html=True)
+        checkboxes = {
+            "vocals": st.checkbox("Vocals 🎤", key="youtube_vocals"),
+            "drums": st.checkbox("Drums 🥁", key="youtube_drums"),
+            "bass": st.checkbox("Bass 🎸", key="youtube_bass"),
+            "other": st.checkbox("Other 🎶", key="youtube_other"),
+        }
+        selected_instruments = [
+            instrument for instrument, checked in checkboxes.items() if checked
+        ]
+        selected_model = st.selectbox(
+            "Select Separation Model:",
+            ["Open-Unmix", "Custom U-Net"],
+            key="youtube_model",
+        )
+        # Separation
+        if st.button(
+            "Separate Music Sources 🎶",
+            type="primary",
+            key="youtube_separate_button",
+            use_container_width=True,
+        ):
+            # Show processing message
+            processing_message = st.empty()
+            processing_message.info("Processing...")
+            # API Call
+            api_call_and_display(audio_file_path, selected_model, selected_instruments)
+            processing_message.empty()
+
+    # Section 3: Upload Audio File
+    with selected_section[2]:
+        st.markdown("<h2>Upload Audio File</h2>", unsafe_allow_html=True)
+        uploaded_file = st.file_uploader(
+            "Choose a file",
+            type=["mp3", "wav", "ogg", "flac"],
+            key="upload_file",
+            help="Supported formats: mp3, wav, ogg, flac.",
+        )
+        if uploaded_file is not None:
+            st.audio(uploaded_file, format="audio/wav")
+        # Options
+        st.markdown("<h2>Select Instruments and Model</h2>", unsafe_allow_html=True)
+        checkboxes = {
+            "vocals": st.checkbox("Vocals 🎤", key="upload_vocals"),
+            "drums": st.checkbox("Drums 🥁", key="upload_drums"),
+            "bass": st.checkbox("Bass 🎸", key="upload_bass"),
+            "other": st.checkbox("Other 🎶", key="upload_other"),
+        }
+        selected_instruments = [
+            instrument for instrument, checked in checkboxes.items() if checked
+        ]
+        selected_model = st.selectbox(
+            "Select Separation Model:",
+            ["Open-Unmix", "Custom U-Net"],
+            key="upload_model",
         )
         # Separation
         if uploaded_file is not None:
-            st.audio(uploaded_file, format="audio/wav")
             audio_file_path = download_uploaded_file(uploaded_file, "audio/upload")
-
             execute = st.button(
-                "Separate Music Sources 🎶", type="primary", use_container_width=True
+                "Separate Music Sources 🎶",
+                type="primary",
+                key="upload_separate_button",
+                use_container_width=True,
             )
             if "executed" not in st.session_state:
                 st.session_state["executed"] = False
             if execute or st.session_state.executed:
                 if execute:
                     st.session_state.executed = False
-
                 if not st.session_state.executed:
+                    # Show processing message
+                    processing_message = st.empty()
+                    processing_message.info("Processing...")
+
                     api_call_and_display(
                         audio_file_path, selected_model, selected_instruments
                     )
+                    processing_message.empty()
