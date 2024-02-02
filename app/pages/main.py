@@ -14,16 +14,14 @@ def main():
     )
 
     pages = {
-        "Upload and Separation": page_upload_and_separation,
+        "Audio Separation": page_upload_and_separation,
         "Karaoke": page_karaoke,
         "About": page_about,
     }
 
     st.sidebar.title("Navigation")
     selected_page = st.sidebar.radio("Go to", list(pages.keys()))
-
     header()
-
     pages[selected_page]()
 
 if __name__ == "__main__":

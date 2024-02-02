@@ -9,7 +9,7 @@ def header(logo_and_title=True):
     if logo_and_title:
         head = st.columns([2, 1, 10, 4])
         with head[1]:
-            st.image("images/logo_app.png", use_column_width=False, width=100)
+            st.image("images/logo.png", use_column_width=False, width=100)
         with head[2]:
             st.markdown(
                 """
